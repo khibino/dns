@@ -7,6 +7,7 @@ module Network.DNS.LookupRaw (
   -- * Lookups returning DNS Messages
   , lookupRaw
   , lookupRawCtl
+  , lookupRawRecv
   -- * DNS Message procesing
   , fromDNSMessage
   ) where
@@ -14,6 +15,7 @@ module Network.DNS.LookupRaw (
 import Data.Hourglass (timeAdd, Seconds)
 import Prelude hiding (lookup)
 import Time.System (timeCurrent)
+import Network.Socket (Socket)
 
 import Network.DNS.IO
 import Network.DNS.Imports hiding (lookup)
@@ -254,6 +256,14 @@ lookupRawCtl :: Resolver      -- ^ Resolver obtained via 'withResolver'
              -> QueryControls -- ^ Query flag and EDNS overrides
              -> IO (Either DNSError DNSMessage)
 lookupRawCtl rslv dom typ ctls = resolve dom typ rslv ctls receive
+
+lookupRawRecv :: Resolver                  -- ^ Resolver obtained via 'withResolver'
+              -> Domain                    -- ^ Query domain
+              -> TYPE                      -- ^ Query RRtype
+              -> QueryControls             -- ^ Query flag and EDNS overrides
+              -> (Socket -> IO DNSMessage) -- ^ Action to receive message from socket
+              -> IO (Either DNSError DNSMessage)
+lookupRawRecv rslv dom typ ctls rcv = resolve dom typ rslv ctls rcv
 
 ----------------------------------------------------------------
 

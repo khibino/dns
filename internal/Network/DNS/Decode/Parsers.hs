@@ -136,11 +136,8 @@ data Decode = forall a . (ResourceData a) => Decode
 toKey :: TYPE -> M.Key
 toKey = fromIntegral . fromTYPE
 
-useDecode :: Decode -> ((forall a . ResourceData a => Proxy a -> r) -> r)
-useDecode (Decode @a) k = k @a (Proxy @a)
-
 decodeRData :: Decode -> Int -> SGet RData
-decodeRData decode len = useDecode decode (\proxy -> RData <$> decodeResourceData proxy len)
+decodeRData (Decode @a) len = RData <$> decodeResourceData (Proxy @a) len
 
 decodeDict :: Dict
 decodeDict =
